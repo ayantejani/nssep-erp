@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSSEP Event Emergency Response Planner</title>
+<style>
+  * { margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  iframe { width: 100%; height: 100%; border: none; }
+  .loading {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: #f0f4f8; font-family: 'Segoe UI', sans-serif; color: #1a3a5c;
+    z-index: 10; transition: opacity 0.3s;
+  }
+  .spinner {
+    border: 4px solid #d0d7de; border-top: 4px solid #1a3a5c;
+    border-radius: 50%; width: 40px; height: 40px;
+    animation: spin 1s linear infinite; margin-bottom: 16px;
+  }
+  .loading-inner { text-align: center; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="loading" id="loader">
+  <div class="loading-inner">
+    <div class="spinner"></div>
+    <p>Loading NSSEP Emergency Response Plan...</p>
+  </div>
+</div>
+
+<iframe id="form-frame" src="about:blank"></iframe>
+
+<script>
+// Power Automate Flow 1 GET URL
+var FLOW1_URL = "https://default98d027077ed646d2acf222ebdd2d5c.17.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4e35195bca234c6ba33b86d81ebf9b09/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GK4mcHNfBe559I1K4TNbXzmxUOAk-7xHuPC5mhVSCnI";
+
+// Read edit_id from query string or hash
+var editId = null;
+var urlParams = new URLSearchParams(window.location.search);
+editId = urlParams.get('edit_id');
+
+if (!editId && window.location.hash) {
+  var hashParams = new URLSearchParams(window.location.hash.substring(1));
+  editId = hashParams.get('edit_id');
+}
+
+// Build iframe URL with edit_id if present
+var iframeSrc = FLOW1_URL;
+if (editId) {
+  iframeSrc += '&edit_id=' + encodeURIComponent(editId);
+}
+
+// Load the form in the iframe
+var frame = document.getElementById('form-frame');
+frame.src = iframeSrc;
+
+// Hide loader when iframe loads
+frame.addEventListener('load', function() {
+  var loader = document.getElementById('loader');
+  loader.style.opacity = '0';
+  setTimeout(function() { loader.style.display = 'none'; }, 300);
+});
+
+// Fallback: hide loader after 8 seconds regardless
+setTimeout(function() {
+  var loader = document.getElementById('loader');
+  if (loader.style.display !== 'none') {
+    loader.style.opacity = '0';
+    setTimeout(function() { loader.style.display = 'none'; }, 300);
+  }
+}, 8000);
+</script>
+
+</body>
+</html>
