@@ -38,20 +38,25 @@
 // Power Automate Flow 1 GET URL
 var FLOW1_URL = "https://default98d027077ed646d2acf222ebdd2d5c.17.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4e35195bca234c6ba33b86d81ebf9b09/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GK4mcHNfBe559I1K4TNbXzmxUOAk-7xHuPC5mhVSCnI";
 
-// Read edit_id from query string or hash
+// Read edit_id or duplicate_id from query string or hash
 var editId = null;
+var dupId = null;
 var urlParams = new URLSearchParams(window.location.search);
 editId = urlParams.get('edit_id');
+dupId = urlParams.get('duplicate_id');
 
-if (!editId && window.location.hash) {
+if (!editId && !dupId && window.location.hash) {
   var hashParams = new URLSearchParams(window.location.hash.substring(1));
   editId = hashParams.get('edit_id');
+  dupId = hashParams.get('duplicate_id');
 }
 
-// Build iframe URL with edit_id if present
+// Build iframe URL with edit_id or duplicate_id if present
 var iframeSrc = FLOW1_URL;
 if (editId) {
   iframeSrc += '&edit_id=' + encodeURIComponent(editId);
+} else if (dupId) {
+  iframeSrc += '&duplicate_id=' + encodeURIComponent(dupId);
 }
 
 // Load the form in the iframe
